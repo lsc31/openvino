@@ -5,7 +5,11 @@
 #include "jit_generator.hpp"
 #include "ngraph/type/float16.hpp"
 
+#ifdef __clang__
+#include <xbyak_util.h>
+#else
 #include <xbyak/xbyak_util.h>
+#endif
 
 namespace ngraph
 {

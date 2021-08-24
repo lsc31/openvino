@@ -90,7 +90,15 @@ public:
         }
         precisionInfo.value = CUSTOM;
     }
+#ifdef __clang__
+    /** @brief Creates custom precision with specific underlined type */
+    template <class T>
+    static INFERENCE_ENGINE_API_CPP(Precision) fromType(const char* typeName = nullptr);
 
+    /** @brief checks whether given storage class T can be used to store objects of current precision */
+    template <class T>
+    INFERENCE_ENGINE_API_CPP(bool) hasStorageType(const char* typeName = nullptr) const noexcept;
+#else
     /** @brief Creates custom precision with specific underlined type */
     template <class T>
     static Precision fromType(const char* typeName = nullptr) {
@@ -140,6 +148,7 @@ public:
             return false;
         }
     }
+#endif //__clang__
 
     /**
      * @brief Equality operator with Precision object

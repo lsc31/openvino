@@ -65,12 +65,19 @@ public:
      * @tparam T Type to be checked. Must represent a class derived from the Blob
      * @return true if this object can be dynamically cast to the type T*. Otherwise, false
      */
+#ifdef __clang__
+    template <typename T,
+              typename std::enable_if<!std::is_pointer<T>::value && !std::is_reference<T>::value, int>::type = 0,
+              typename std::enable_if<std::is_base_of<Blob, T>::value, int>::type = 0>
+    bool is() noexcept;
+#else
     template <typename T,
               typename std::enable_if<!std::is_pointer<T>::value && !std::is_reference<T>::value, int>::type = 0,
               typename std::enable_if<std::is_base_of<Blob, T>::value, int>::type = 0>
     bool is() noexcept {
         return dynamic_cast<T*>(this) != nullptr;
     }
+#endif
 
     /**
      * @brief Checks if the Blob object can be cast to the type const T*
@@ -78,12 +85,19 @@ public:
      * @tparam T Type to be checked. Must represent a class derived from the Blob
      * @return true if this object can be dynamically cast to the type const T*. Otherwise, false
      */
+#ifdef __clang__
+    template <typename T,
+              typename std::enable_if<!std::is_pointer<T>::value && !std::is_reference<T>::value, int>::type = 0,
+              typename std::enable_if<std::is_base_of<Blob, T>::value, int>::type = 0>
+    bool is() const noexcept;
+#else
     template <typename T,
               typename std::enable_if<!std::is_pointer<T>::value && !std::is_reference<T>::value, int>::type = 0,
               typename std::enable_if<std::is_base_of<Blob, T>::value, int>::type = 0>
     bool is() const noexcept {
         return dynamic_cast<const T*>(this) != nullptr;
     }
+#endif
 
     /**
      * @brief Casts this Blob object to the type T*.
@@ -576,7 +590,13 @@ public:
     /**
      *@brief Virtual destructor.
      */
+#ifdef __clang__
     virtual ~TBlob();
+#else
+    virtual ~TBlob() {
+        free();
+    }
+#endif  // __clang__
 
     /**
      * @brief Gets the size of the given type.

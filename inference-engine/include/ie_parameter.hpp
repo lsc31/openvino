@@ -139,10 +139,14 @@ public:
      * @tparam T Type of value
      * @return true if type of value is correct
      */
+#ifdef __clang__
+    template <class T> bool is() const;
+#else
     template <class T>
     bool is() const {
         return empty() ? false : ptr->is(typeid(T));
     }
+#endif // __clang__
 
     /**
      * Dynamic cast to specified type
@@ -287,10 +291,13 @@ private:
     template <class T>
     struct RealData : Any, std::tuple<T> {
         using std::tuple<T>::tuple;
-
+#ifdef __clang__
+        bool is(const std::type_info& id) const override;
+#else
         bool is(const std::type_info& id) const override {
             return id == typeid(T);
         }
+#endif //__clang__
         Any* copy() const override {
             return new RealData {get()};
         }
@@ -314,10 +321,13 @@ private:
         equal(const Any& left, const Any& rhs) const {
             return dyn_cast<U>(&left) == dyn_cast<U>(&rhs);
         }
-
+#ifdef __clang__
+        bool operator==(const Any& rhs) const override;
+#else
         bool operator==(const Any& rhs) const override {
             return rhs.is(typeid(T)) && equal<T>(*this, rhs);
         }
+#endif //__clang__
     };
 
     template <typename T>
@@ -340,7 +350,7 @@ private:
   */
 using ParamMap = std::map<std::string, Parameter>;
 
-#ifdef __ANDROID__
+#ifdef __clang__
 extern template struct INFERENCE_ENGINE_API_CLASS(InferenceEngine::Parameter::RealData<InferenceEngine::Blob::Ptr>);
 extern template struct INFERENCE_ENGINE_API_CLASS(InferenceEngine::Parameter::RealData<int>);
 extern template struct INFERENCE_ENGINE_API_CLASS(InferenceEngine::Parameter::RealData<bool>);

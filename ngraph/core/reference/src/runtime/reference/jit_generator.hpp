@@ -5,7 +5,11 @@
 #pragma once
 
 #include <functional>
+#ifdef __clang__
+#include <xbyak.h>
+#else
 #include <xbyak/xbyak.h>
+#endif
 
 namespace ngraph
 {
